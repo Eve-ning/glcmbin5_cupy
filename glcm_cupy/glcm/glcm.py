@@ -44,7 +44,8 @@ def glcm(
                                Features.MEAN,
                                Features.VARIANCE,
                                Features.CORRELATION,
-                               Features.DISSIMILARITY),
+                               Features.DISSIMILARITY,
+                               Features.ENTROPY),
     normalized_features: bool = True,
     verbose: bool = True
 ) -> ndarray:
@@ -103,7 +104,7 @@ class GLCM(GLCMBase):
     def __post_init__(self):
         super().__post_init__()
         if self.step_size <= 0:
-            raise ValueError(f"Step Size {step_size} should be >= 1")
+            raise ValueError(f"Step Size {self.step_size} should be >= 1")
 
     def glcm_cells(self, im: cp.ndarray) -> int:
         """ Total number of GLCM cells to process """

@@ -25,6 +25,7 @@ class Features(IntEnum):
     VARIANCE = 4
     CORRELATION = 5
     DISSIMILARITY = 6
+    ENTROPY = 7
 
 
 NO_OF_FEATURES = len(Features)

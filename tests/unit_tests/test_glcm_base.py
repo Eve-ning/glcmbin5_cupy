@@ -41,7 +41,8 @@ def test_glcm_ij(i, j):
         float(g[..., Features.MEAN].sum() / windows),
         float(g[..., Features.VARIANCE].sum() / windows),
         float(g[..., Features.CORRELATION].sum() / windows),
-        float(g[..., Features.DISSIMILARITY].sum() / windows)
+        float(g[..., Features.DISSIMILARITY].sum() / windows),
+        float(g[..., Features.ENTROPY].sum() / windows)
     ]
 
     expected = glcm_py_ij(i, j, 256, 256)

@@ -50,7 +50,7 @@ class GLCMPyBase:
         glcm /= len(i_flat) * 2
 
         homogeneity = contrast = asm = mean = var = \
-            correlation = dissimilarity = 0
+            correlation = dissimilarity = entropy = 0
         for i in range(glcm.shape[0]):
             for j in range(glcm.shape[1]):
                 dissimilarity += glcm[i, j] * np.abs(i - j)
@@ -58,6 +58,8 @@ class GLCMPyBase:
                 contrast += glcm[i, j] * (i - j) ** 2
                 asm += glcm[i, j] ** 2
                 mean += glcm[i, j] * i
+                if glcm[i, j] != 0:
+                    entropy += glcm[i, j] * -np.log(glcm[i, j])
 
         for i in range(glcm.shape[0]):
             for j in range(glcm.shape[1]):
@@ -70,4 +72,4 @@ class GLCMPyBase:
                     correlation += glcm[i, j] * (i - mean) * (j - mean) / var
 
         return [homogeneity, contrast, asm, mean, var, correlation,
-                dissimilarity]
+                dissimilarity, entropy]

@@ -51,6 +51,14 @@ atomicAdd(
 );
 """
 
+ENTROPY_FN = """
+atomicAdd(
+    &features[ENTROPY + wid * NO_OF_FEATURES],
+    p * -logf(p)
+);
+"""
+
+
 
 def get_glcm_module(
     homogeneity=True,
@@ -59,7 +67,8 @@ def get_glcm_module(
     mean=True,
     variance=True,
     correlation=True,
-    dissimilarity=True
+    dissimilarity=True,
+    entropy=True,
 ):
     if correlation:
         variance = True
@@ -74,7 +83,8 @@ def get_glcm_module(
 #define VAR 4
 #define CORRELATION 5
 #define DISSIMILARITY 6
-#define NO_OF_FEATURES 7
+#define ENTROPY 7
+#define NO_OF_FEATURES 8
 
 extern "C" {{
     __global__ void glcmCreateKernel(
@@ -240,7 +250,7 @@ extern "C" {{
 
         For each feature, we require a wid * NO_OF_FEATURES offset.
 
-        6 x 1 for each GLCM
+        8 x 1 for each GLCM
         +----------------+ +----------------+ +----------------+
         | HOMOGENEITY    | | HOMOGENEITY    | | HOMOGENEITY    |
         | CONTRAST       | | CONTRAST       | | CONTRAST       |
@@ -248,7 +258,8 @@ extern "C" {{
         | MEAN           | | MEAN           | | MEAN           |
         | VAR            | | VAR            | | VAR            |
         | CORRELATION    | | CORRELATION    | | CORRELATION    |
-        | DISSIMILARITY  | | DISSIMILARITY  | | DISSIMILARITY  | 
+        | DISSIMILARITY  | | DISSIMILARITY  | | DISSIMILARITY  |
+        | ENTROPY        | | ENTROPY        | | ENTROPY        | 
         +----------------+ +----------------+ +----------------+
         Window 0           Window 1           Window 2           ...
         **/
@@ -259,6 +270,7 @@ extern "C" {{
         {ASM_FN if asm else ""}
         {MEAN_FN if mean else ""}
         {DISSIMILARITY_FN if dissimilarity else ""}
+        {ENTROPY_FN if entropy else ""}
     }}
     __global__ void glcmFeatureKernel1(
         const float* g,

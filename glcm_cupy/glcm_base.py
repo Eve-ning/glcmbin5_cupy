@@ -18,7 +18,8 @@ FEATURES = Features.HOMOGENEITY, \
            Features.MEAN, \
            Features.VARIANCE, \
            Features.CORRELATION, \
-           Features.DISSIMILARITY
+           Features.DISSIMILARITY, \
+           Features.ENTROPY
 
 
 @dataclass
@@ -59,7 +60,8 @@ class GLCMBase:
                                Features.MEAN,
                                Features.VARIANCE,
                                Features.CORRELATION,
-                               Features.DISSIMILARITY)
+                               Features.DISSIMILARITY,
+                               Features.ENTROPY)
     normalized_features: bool = True
     verbose: bool = True
 
@@ -102,7 +104,8 @@ class GLCMBase:
             mean=Features.MEAN in self.features,
             variance=Features.VARIANCE in self.features,
             correlation=Features.CORRELATION in self.features,
-            dissimilarity=Features.DISSIMILARITY in self.features
+            dissimilarity=Features.DISSIMILARITY in self.features,
+            entropy=Features.ENTROPY in self.features
         )
         self.glcm_create_kernel = module.get_function('glcmCreateKernel')
         self.glcm_feature_kernel_0 = module.get_function('glcmFeatureKernel0')
@@ -364,5 +367,6 @@ class GLCMBase:
                 Features.MEAN in self.features or
                 Features.VARIANCE in self.features or
                 Features.CORRELATION in self.features or
-                Features.DISSIMILARITY in self.features
+                Features.DISSIMILARITY in self.features or
+                Features.ENTROPY in self.features
             )

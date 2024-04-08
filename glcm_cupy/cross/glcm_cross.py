@@ -35,6 +35,7 @@ def glcm_cross(
                                Features.VARIANCE,
                                Features.CORRELATION,
                                Features.DISSIMILARITY,
+                               Features.ENTROPY,
                                ),
     verbose: bool = True,
     ix_combos: Sequence[Tuple[int, int]] | None = None
