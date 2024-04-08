@@ -306,7 +306,7 @@ class GLCMBase:
         self.ar_features[:] = 0
 
         no_of_windows = i.shape[0]
-        no_of_values = self._diameter ** 2
+        no_of_values = i.shape[1]
 
         if i.dtype != cp.uint8 or j.dtype != cp.uint8:
             raise ValueError(

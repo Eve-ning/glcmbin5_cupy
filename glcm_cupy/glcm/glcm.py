@@ -46,6 +46,7 @@ def glcm(
                                Features.CORRELATION,
                                Features.DISSIMILARITY),
     normalized_features: bool = True,
+    skip_border: bool = False,
     verbose: bool = True
 ) -> ndarray:
     """
@@ -71,6 +72,7 @@ def glcm(
         max_threads: Maximum threads for CUDA
         features: Select features to be included
         normalized_features: Whether to normalize features to [0, 1]
+        skip_border: Wheter to skip border of interfacing windows. When skipping border, result is the same as a GLCM calculated on each 7x7 window, without neighbourhood information. Default is False.
         verbose: Whether to enable TQDM logging
 
     Returns:
@@ -86,6 +88,7 @@ def glcm(
         normalized_features=normalized_features,
         step_size=step_size,
         directions=directions,
+        skip_border=skip_border,
         verbose=verbose
     ).run(im)
 
@@ -99,6 +102,7 @@ class GLCM(GLCMBase):
         Direction.SOUTH,
         Direction.SOUTH_WEST
     )
+    skip_border: bool = False
 
     def __post_init__(self):
         super().__post_init__()
@@ -203,6 +207,9 @@ class GLCM(GLCMBase):
         for direction in self.directions:
             i, j = self.pair_windows(ij, direction=direction)
 
+            if self.skip_border:
+                i, j = self._remove_border((i, j), direction)
+
             i = i.reshape((-1, *i.shape[-2:])) \
                 .reshape((i.shape[0] * i.shape[1], -1))
             j = j.reshape((-1, *j.shape[-2:])) \
@@ -210,6 +217,40 @@ class GLCM(GLCMBase):
             ijs.append((i, j))
 
         return ijs
+
+    def _remove_border(self, ij: Tuple[cp.ndarray, cp.ndarray], direction: Direction) -> Tuple[cp.ndarray, cp.ndarray]:
+        if direction == Direction.EAST:
+            sl = (
+                slice(None, None),
+                slice(None, None),
+                slice(None, None),
+                slice(None, -self.step_size),
+            )
+        elif direction == Direction.SOUTH_EAST:
+            sl = (
+                slice(None, None),
+                slice(None, None),
+                slice(None, -self.step_size),
+                slice(None, -self.step_size),
+            )
+        elif direction == Direction.SOUTH:
+            sl = (
+                slice(None, None),
+                slice(None, None),
+                slice(None, -self.step_size),
+                slice(None, None),
+            )
+        elif direction == Direction.SOUTH_WEST:
+            sl = (
+                slice(None, None),
+                slice(None, None),
+                slice(None, -self.step_size),
+                slice(self.step_size, None),
+            )
+        else:
+            raise ValueError("Invalid Direction")
+
+        return ij[0][sl], ij[1][sl]
 
     def pair_windows(self, ij: ndarray,
                      direction: Direction) -> Tuple[ndarray, ndarray]:

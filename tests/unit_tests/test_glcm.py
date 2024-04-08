@@ -40,11 +40,15 @@ def test_glcm_normalize(ar):
     "radius",
     [1, 2, 4]
 )
-def test_glcm(size, bin_from, bin_to, radius):
+@pytest.mark.parametrize(
+    "skip_border",
+    [False, True]
+)
+def test_glcm(size, bin_from, bin_to, radius, skip_border):
     ar = np.random.randint(0, bin_from, [size, size, 1])
-    g = GLCM(radius=radius, bin_from=bin_from, bin_to=bin_to).run(ar)
-    g_fn = glcm(ar, radius=radius, bin_from=bin_from, bin_to=bin_to)
-    expected = glcm_py_im(ar, radius=radius, bin_from=bin_from, bin_to=bin_to)
+    g = GLCM(radius=radius, bin_from=bin_from, bin_to=bin_to, skip_border=skip_border).run(ar)
+    g_fn = glcm(ar, radius=radius, bin_from=bin_from, bin_to=bin_to, skip_border=skip_border)
+    expected = glcm_py_im(ar, radius=radius, bin_from=bin_from, bin_to=bin_to, skip_border=skip_border)
     assert g == pytest.approx(expected, abs=0.001)
     assert g_fn == pytest.approx(expected, abs=0.001)
 
